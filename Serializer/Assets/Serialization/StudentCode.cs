@@ -68,10 +68,17 @@ namespace Assets.Serialization
         {
             //string a = o.GetType().Name;
             //SerializedFields(o);
-            Utilities.SerializedFields(o);
+            IEnumerable<KeyValuePair<string, object>> fields = Utilities.SerializedFields(o);
             UnityEngine.Debug.Log("hi");
 
-
+            Dictionary<object, int> dict = new Dictionary<object, int>();
+            dict.Add(o, 0);
+            foreach (KeyValuePair<string, object> field in fields)
+            {
+                UnityEngine.Debug.Log("Key: " + field.Key + " Value: " + field.Value);
+                //dict.Add(field.Value, 0);
+            }
+            UnityEngine.Debug.Log(dict.ToString);
         }
     }
 
