@@ -64,21 +64,135 @@ namespace Assets.Serialization
         /// If it hasn't then output #id { type: "typename", field: value ... }
         /// </summary>
         /// <param name="o">Object to serialize</param>
+        ///
+
+        //#0{
+        //        type: "FakeGameObject",
+        //    name: "test",
+        //    components: [
+        //#1{
+        //            type: "FakeTransform",
+        //            X: 0,
+        //            Y: 0,
+        //            parent: null,
+        //            children: [
+        //#2{
+        //                    type: "FakeTransform",
+        //                    X: 100,
+        //                    Y: 100,
+        //                    parent: #1,
+        //                    children: [
+        //#3{
+        //                            type: "FakeTransform",
+        //                            X: 0,
+        //                            Y: 0,
+        //                            parent: #2,
+        Dictionary<object, int> dict = new Dictionary<object, int>();
+        int num = 0;
+
         private void WriteComplexObject(object o)
         {
+            // This is the method that gets called to serialize objects that
+            // have fields in them.
+            // -You will need to assign the object a serial
+            // number, if you haven’t already, and
+            // remember that serial number in a hash table (use the Dictionary<object,int> data type;
+            // search for “C# Dictionary class” for documentation).
+            // -If there’s already a serial number assigned to the object, then you’ve
+            // already written the object once in this serialization, so just
+            // write out a # followed by the number.
+            // -If you haven’t already assigned a number, assign one, remember it, write out # followed
+            // by the number, and the write { }s with the type and fields
+            // written inside, separated by commas.
+
+
             //string a = o.GetType().Name;
+
             //SerializedFields(o);
             IEnumerable<KeyValuePair<string, object>> fields = Utilities.SerializedFields(o);
-            UnityEngine.Debug.Log("hi");
+            //UnityEngine.Debug.Log("hi ");
 
-            Dictionary<object, int> dict = new Dictionary<object, int>();
-            dict.Add(o, 0);
-            foreach (KeyValuePair<string, object> field in fields)
+            //Dictionary<object, int> dict = new Dictionary<object, int>();
+            //dict.Add(o, 0);
+            //indentLevel = 0;
+            
+            dict.Add(o, num);
+            num++;
+
+
+            foreach (var field in fields)
             {
-                UnityEngine.Debug.Log("Key: " + field.Key + " Value: " + field.Value);
-                //dict.Add(field.Value, 0);
+                WriteField(field.Key, field.Value, false);
+                try
+                {
+                    UnityEngine.Debug.Log("Fields - Key: " + field.Key + " Value: " + field.Value);
+                    //UnityEngine.Debug.Log("Fields - Object Name: " + field.Value.GetType().Name);
+
+                    //if (dict.ContainsKey(field.Value))
+                    //{
+                    //    dict.Add("null", num);
+
+                    //}
+                    //else
+                    //{
+                    //    dict.Add(field.Value, num);
+                    //    WriteField(field.Key, field.Value, false);
+                        //Add the object to the dictionary with assigned serial number if it doesn't already exist
+                        // implement TryAdd(), fix handling null value
+                        //WriteField(string fieldName, object fieldValue, bool firstOne)
+                        //try
+                        //{
+                        //    WriteField(field.Key, field.Value, false);
+                        //    //if ((!dict.ContainsKey(field.Value)))
+                        //    //{
+
+                        //    dict.Add(field.Value, num);
+                        //    //} 
+                        //    //UnityEngine.Debug.Log("[fields] Key: " + field.Key + " Value: " + field.Value);
+                        //}
+                        //catch (ArgumentNullException)
+                        //{
+                        //    UnityEngine.Debug.Log("I got nothing");
+                        //    dict.Add("null", num);
+                        //}
+                        
+                    //}
+                }
+                catch (ArgumentNullException)
+                {
+                    UnityEngine.Debug.Log("I got nothing");
+                    //dict.Add("null", num);
+
+                }
+                //num++;
             }
-            UnityEngine.Debug.Log(dict.ToString);
+            //print dict
+            //UnityEngine.Debug.Log(dict.ToString);
+            foreach (KeyValuePair<object, int> page in dict)
+            {
+                UnityEngine.Debug.Log("[dict] Key: " + page.Key + "\nValue: " + page.Value);
+
+            }
+
+            // Step: Check if object has already been serialized
+            // https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-5.0 
+            // Dictionary.ContainsKey(TKey)
+            // Dictionary.ContainsValue(TValue)
+            // Dictionary.Equals()
+
+
+            // Step: Assign a serial number to the object
+            // https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1?view=net-5.0
+            //List<int> serialNums = new List<int>();
+            //last list value +1
+
+
+            // Step: Put object and serial number into Dictionary
+
+
+            // Step: Print #Serial num{ \n "type: ", type, "name: ", name, "components: ["
+            // Serializer.indentLevel, Serializer.NewLine(), Serializer.WriteField(),
+            // Serializer.WriteBracketedExpression(), Serializer.WriteList()
         }
     }
 
