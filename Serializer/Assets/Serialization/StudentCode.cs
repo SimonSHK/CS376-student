@@ -121,19 +121,28 @@ namespace Assets.Serialization
             if (dict.ContainsKey(o))
             {
                 //print # serial num
+                Write("#" + dict[o]);
             }
             else
             {
                 dict.Add(o, num);
-                num++;
+                
 
-                //write object type before listing fields
-                WriteField("type", o, true);
-                //write each of the fields of the object
-                foreach (KeyValuePair<string, object> field in fields)
+                // write serial number
+                Write("#" + num);
+                WriteBracketedExpression("{", () =>
                 {
-                    WriteField(field.Key, field.Value, false);
-                }
+                    //write object type before listing fields
+                    WriteField("type", o.GetType().Name, true);
+                    num++;
+                    //write each of the fields of the object
+                    foreach (KeyValuePair<string, object> field in fields)
+                    {
+                        WriteField(field.Key, field.Value, false);
+                    }
+                },"}");
+                //Write("#" + num);
+                //num++;
             }
 
 
