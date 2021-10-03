@@ -66,8 +66,8 @@ namespace Assets.Serialization
         /// <param name="o">Object to serialize</param>
         private void WriteComplexObject(object o)
         {
-            //string a = o.GetType().Name;
-            //SerializedFields(o);
+            string a = o.GetType().Name;
+            SerializedFields(o);
             IEnumerable<KeyValuePair<string, object>> fields = Utilities.SerializedFields(o);
             UnityEngine.Debug.Log("hi");
 
@@ -77,8 +77,14 @@ namespace Assets.Serialization
             {
                 UnityEngine.Debug.Log("Key: " + field.Key + " Value: " + field.Value);
                 //dict.Add(field.Value, 0);
+                
             }
             UnityEngine.Debug.Log(dict.ToString);
+
+            foreach (var a in Utilities.SerializedFields(o))
+            {
+                WriteField(a.Key, a.Value, false);
+            }
         }
     }
 
