@@ -115,17 +115,35 @@ namespace Assets.Serialization
             //Dictionary<object, int> dict = new Dictionary<object, int>();
             //dict.Add(o, 0);
             //indentLevel = 0;
-            
-            dict.Add(o, num);
-            num++;
 
+            //dict.Add(o, num);
 
-            foreach (var field in fields)
+            if (dict.ContainsKey(o))
             {
-                WriteField(field.Key, field.Value, false);
-                try
+                //print # serial num
+            }
+            else
+            {
+                dict.Add(o, num);
+                num++;
+
+                //write object type before listing fields
+                WriteField("type", o, true);
+                //write each of the fields of the object
+                foreach (KeyValuePair<string, object> field in fields)
                 {
-                    UnityEngine.Debug.Log("Fields - Key: " + field.Key + " Value: " + field.Value);
+                    WriteField(field.Key, field.Value, false);
+                }
+            }
+
+
+            //old
+            //foreach (var field in fields)
+            //{
+            //    WriteField(field.Key, field.Value, false);
+            //    try
+            //    {
+            //        UnityEngine.Debug.Log("Fields - Key: " + field.Key + " Value: " + field.Value);
                     //UnityEngine.Debug.Log("Fields - Object Name: " + field.Value.GetType().Name);
 
                     //if (dict.ContainsKey(field.Value))
@@ -157,15 +175,15 @@ namespace Assets.Serialization
                         //}
                         
                     //}
-                }
-                catch (ArgumentNullException)
-                {
-                    UnityEngine.Debug.Log("I got nothing");
-                    //dict.Add("null", num);
+                //}
+                //catch (ArgumentNullException)
+                //{
+                //    UnityEngine.Debug.Log("I got nothing");
+                //    //dict.Add("null", num);
 
-                }
+                //}
                 //num++;
-            }
+            //}
             //print dict
             //UnityEngine.Debug.Log(dict.ToString);
             foreach (KeyValuePair<object, int> page in dict)
@@ -210,6 +228,7 @@ namespace Assets.Serialization
 
             if (End)
                 throw new EndOfStreamException();
+                //return "null";
 
             switch (PeekChar)
             {
@@ -235,6 +254,7 @@ namespace Assets.Serialization
             }
         }
 
+        List<int> ids = new List<int>();
         /// <summary>
         /// Called when the next character is a #.  Read the object id of the object and return the
         /// object.  If that object id has already been read, return the object previously returned.
@@ -245,12 +265,17 @@ namespace Assets.Serialization
         /// <returns>The object referred to by this #id expression.</returns>
         private object ReadComplexObject(int enclosingId)
         {
+            UnityEngine.Debug.Log("Enclosing ID: " + enclosingId);
             GetChar();  // Swallow the #
             var id = (int)ReadNumber(enclosingId);
             SkipWhitespace();
 
-            // You've got the id # of the object.  Are we done now?
-            throw new NotImplementedException("Fill me in");
+            // TODO: You've got the id # of the object.  Are we done now?
+            if (ids.Contains(1))
+            {
+
+            }
+            //throw new NotImplementedException("Fill me in");
 
             // Assuming we aren't done, let's check to make sure there's a { next
             SkipWhitespace();
