@@ -195,11 +195,11 @@ namespace Assets.Serialization
             //}
             //print dict
             //UnityEngine.Debug.Log(dict.ToString);
-            foreach (KeyValuePair<object, int> page in dict)
-            {
-                UnityEngine.Debug.Log("[dict] Key: " + page.Key + "\nValue: " + page.Value);
+            //foreach (KeyValuePair<object, int> page in dict)
+            //{
+            //    UnityEngine.Debug.Log("[dict] Key: " + page.Key + "\nValue: " + page.Value);
 
-            }
+            //}
 
             // Step: Check if object has already been serialized
             // https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-5.0 
@@ -264,6 +264,7 @@ namespace Assets.Serialization
         }
 
         List<int> ids = new List<int>();
+        Dictionary<int, object> objs = new Dictionary<int, object>();
         /// <summary>
         /// Called when the next character is a #.  Read the object id of the object and return the
         /// object.  If that object id has already been read, return the object previously returned.
@@ -274,15 +275,22 @@ namespace Assets.Serialization
         /// <returns>The object referred to by this #id expression.</returns>
         private object ReadComplexObject(int enclosingId)
         {
-            UnityEngine.Debug.Log("Enclosing ID: " + enclosingId);
             GetChar();  // Swallow the #
             var id = (int)ReadNumber(enclosingId);
             SkipWhitespace();
 
-            // TODO: You've got the id # of the object.  Are we done now?
-            if (ids.Contains(1))
-            {
+            UnityEngine.Debug.Log("Enclosing ID: " + enclosingId);
+            UnityEngine.Debug.Log("[ID]: " + id);
 
+
+            //if (GetChar() == '{')
+            //{
+            //    UnityEngine.Debug.Log("[Field]:  " + ReadField(enclosingId));
+            //}
+            // TODO: You've got the id # of the object.  Are we done now?
+            if (objs.ContainsKey(id))
+            {
+                return objs[id];
             }
             //throw new NotImplementedException("Fill me in");
 
@@ -291,6 +299,7 @@ namespace Assets.Serialization
             if (End)
                 throw new EndOfStreamException($"Stream ended after reference to unknown ID {id}");
             var c = GetChar();
+            UnityEngine.Debug.Log("Eaten char: " + c);
             if (c != '{')
                 throw new Exception($"Expected '{'{'}' after #{id} but instead got {c}");
 
@@ -305,15 +314,25 @@ namespace Assets.Serialization
                 throw new Exception(
                     $"Expected a type name (a string) in 'type: ...' expression for object id {id}, but instead got {typeName}");
 
-            // Great!  Now what?
-            throw new NotImplementedException("Fill me in");
+            // TODO: Great!  Now what?
+            // Assumptions: just passed '{', typename exists in type
+            Object currentObj = Utilities.MakeInstance(type);
+            objs.Add(id, currentObj);
+            //throw new NotImplementedException("Fill me in");
 
             // Read the fields until we run out of them
             while (!End && PeekChar != '}')
             {
                 var (field, value) = ReadField(id);
-                // We've got a field and a value.  Now what?
-                throw new NotImplementedException("Fill me in");
+                // TODO: We've got a field and a value.  Now what?
+                //if (PeekChar == '[')
+                //if (value is List<object>)
+                //{
+                //    //GetChar();
+                //    ReadComplexObject(id);
+                //}
+                Utilities.SetFieldByName(currentObj, field, value);
+                //throw new NotImplementedException("Fill me in");
             }
 
             if (End)
@@ -321,8 +340,10 @@ namespace Assets.Serialization
 
             GetChar();  // Swallow close bracket
 
-            // We're done.  Now what?
-            throw new NotImplementedException("Fill me in");
+            // TODO: We're done.  Now what?
+            objs[id] = currentObj;
+            return currentObj;
+            //throw new NotImplementedException("Fill me in");
         }
     }
 }
